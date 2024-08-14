@@ -1,0 +1,58 @@
+services:
+  database:
+    image: postgres:16
+    restart: always
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
+      - POSTGRES_NON_ROOT_USER=${DB_NON_ROOT_USER}
+      - POSTGRES_NON_ROOT_PASSWORD=${DB_NON_ROOT_PASSWORD}
+    volumes:
+      - database_storage:/var/lib/postgres/data
+      - ./init-data.sh:/docker-entrypoint-initdb.d/init-data.sh
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -h localhost -U ${DB_USER} -d ${DB_NAME}']
+      interval: ${DB_HEALTHCHECK_INTERVAL}
+      timeout: ${DB_HEALTHCHECK_TIMEOUT}
+      retries: ${DB_HEALTHCHECK_RETRIES}
+  n8n:
+    image: docker.n8n.io/n8nio/n8n:1.54.1
+    restart: always
+    environment:
+      - DB_TYPE:=${DB_TYPE}
+      - DB_POSTGRESDB_HOST=${DB_HOST}
+      - DB_POSTGRESDB_PORT=${DB_PORT}
+      - DB_POSTGRESDB_DATABASE=${DB_NAME}
+      - DB_POSTGRESDB_USER=${DB_NON_ROOT_USER}
+      - DB_POSTGRESDB_PASSWORD=${DB_NON_ROOT_PASSWORD}
+    ports:
+      - 5678:5678
+    links:
+      - database
+      - cache
+    volumes:
+      - n8n_storage:/home/node/.n8n
+    depends_on: 
+      database:
+        condition: service_healthy
+      cache:
+        condition: service_healthy
+  cache:
+    image: redis:6.2-alpine
+    restart: always
+    ports:
+      - '6379:6379'
+    command: redis-server --save 20 1 --loglevel warning --requirepass ${CACHE_KEY}
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+      interval: ${CACHE_HEALTHCHECK_INTERVAL}
+      timeout: ${CACHE_HEALTHCHECK_TIMEOUT}
+      retries: ${CACHE_HEALTHCHECK_RETRIES}
+
+    volumes: 
+      - cache:/data
+volumes:
+  database_storage:
+  n8n_storage:
+  cache:
