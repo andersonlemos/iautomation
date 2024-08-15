@@ -16,22 +16,12 @@ The IAutomation is a [GUI APPLICATION](https://en.wikipedia.org/wiki/Graphical_u
 ### Dependencies
 
 |library|version|
-<<<<<<< HEAD
 |---|---|
 |docker|[27.1.2](https://docs.docker.com/get-docker/)|
 |compose|[2.29.1-desktop.1](https://docs.docker.com/compose/install/)|
 |make|[GNU Make 4.3](https://www.gnu.org/software/make/)|
 
 **NOTE:** *The project was written in docker and using compose, so you will need to [install](https://docs.docker.com/get-docker/) on your system.*
-=======
-|---|---|---|
-|docker|[27.1.2](https://docs.docker.com/get-docker/)|
-|compose|[2.29.1-desktop.1](https://docs.docker.com/compose/install/)|
-|make|[GNU Make 4.3](https://www.gnu.org/software/make/)|
-|---|---|---|
-
-**NOTE:** *The project was written in docker and using compose, so you will need to [install](https://docs.docker.com/get-docker/)on your system.*
->>>>>>> d489193 (README updated)
 
 ## On Unix based systems
 
